@@ -1,5 +1,6 @@
 package datos;
 
-public class Ingresados {
-
+public class Ingresados 
+{
+    
 }
