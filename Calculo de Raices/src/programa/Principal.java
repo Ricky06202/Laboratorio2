@@ -1,7 +1,5 @@
 package programa;
 
-import java.util.Scanner;
-
 import datos.Funcion;
 import metodos.*;
 
@@ -11,7 +9,7 @@ public class Principal
 	{
 		Funcion funcion = (x) -> -0.5*Math.pow(x,2) + 2.5*x + 4; 
 		
-		CalculoRaices metodoUsado = new Secante(funcion, 5, 9);
+		CalculoRaices metodoUsado = new Biseccion(funcion, 5, 9);
 		metodoUsado.setTolerancia(0.0001);
 
 		int contador = 0;
