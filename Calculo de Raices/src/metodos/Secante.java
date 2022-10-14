@@ -8,7 +8,6 @@ public class Secante extends CalculoRaices{
 		super(funcion);
         setAnterior(segundo);
         setUltima(primero);
-		//TODO Auto-generated constructor stub
 	}
 
 	@Override
