@@ -42,6 +42,8 @@ public class Ventana extends JFrame{
     private JScrollPane panelScroll;
     private JPanel panelEtiquetas;
     private JLabel biseccion, reglaFalsa, secante;
+    private JLabel valorA, valorB, valorError, textoFuncion;
+    private JPanel panelInformacion;
 
     private double puntoA, puntoB, error;
     private DecimalFormat formato = new DecimalFormat("#.############");
@@ -55,12 +57,13 @@ public class Ventana extends JFrame{
     letraBoton = new Font("Matura MT Script Capitals", Font.PLAIN, 40),
     letraBotonAccionVentana = new Font("Bauhaus 93", Font.PLAIN, 20);
 
-    public Ventana(Funcion funcion){
+    public Ventana(Funcion funcion, String textoFuncion){
         inicializarVentana();
         inicializarPanelIzquierdo();
         inicializarPanelSuperior();
         inicializarPanelCentral();
         panelCentral.add(panelPrincipal); // para que sea el primero en aparecer
+        this.textoFuncion.setText("f(x) = " + textoFuncion);
         establecerFuncionBotonesMenu();
         establecerFuncionBotonAceptar(funcion);
         setVisible(true);
@@ -118,6 +121,19 @@ public class Ventana extends JFrame{
                 fila = obtenerFilaTabla(metodos, conteo++);
                 celdas.addRow(fila);
             }
+
+            //! Actualizamos los Valores
+            String texto = valorA.getText();
+            String textoBase = texto.substring(0,texto.indexOf("=")+2);
+            valorA.setText(textoBase + puntoA + " ,");
+
+            texto = valorB.getText();
+            textoBase = texto.substring(0,texto.indexOf("=")+2);
+            valorB.setText(textoBase + puntoB + ")");
+
+            texto = valorError.getText();
+            textoBase = texto.substring(0,texto.indexOf("=")+2);
+            valorError.setText(textoBase + formato.format(error) + "%");
 
             JOptionPane.showMessageDialog(this, "Hemos Calculado las Raices\n\n".toUpperCase() +
             "Puede Observar los Calculos en la \"Tabla\"", "CALCULOS REALIZADOS CON EXITO!!!", JOptionPane.INFORMATION_MESSAGE);
@@ -206,24 +222,58 @@ public class Ventana extends JFrame{
         panelEtiquetas = new JPanel();
         panelEtiquetas.setOpaque(false);
         panelEtiquetas.setLayout(null);
-        panelEtiquetas.setPreferredSize(new Dimension(0,50));
+        panelEtiquetas.setPreferredSize(new Dimension(0,150));
+
+        int altura = 3 + 100;
 
         biseccion = new JLabel("Bisección");
         biseccion.setFont(letraTexto);
-        biseccion.setBounds(165,3,200,50);
+        biseccion.setBounds(165,altura,200,50);
         
         reglaFalsa = new JLabel("Regla Falsa");
         reglaFalsa.setFont(letraTexto);
-        reglaFalsa.setBounds(165*2+50,3,200,50);
+        reglaFalsa.setBounds(165*2+50,altura,200,50);
         
         secante = new JLabel("Secante");
         secante.setFont(letraTexto);
-        secante.setBounds(165*4-30,3,200,50);
+        secante.setBounds(165*4-30,altura,200,50);
         
         panelEtiquetas.add(biseccion);
         panelEtiquetas.add(reglaFalsa);
         panelEtiquetas.add(secante);
+
+        Color colorInfo = new Color(31,105,165);
+
+        valorA = new JLabel("Intervalo (A = ? ,");
+        valorA.setFont(letraTexto);
+        valorA.setForeground(colorInfo);
+   
+        valorB = new JLabel("B = ?)");
+        valorB.setFont(letraTexto);
+        valorB.setForeground(colorInfo);
+   
+        valorError = new JLabel("Error = ?");
+        valorError.setFont(letraTexto);
+        valorError.setForeground(colorInfo);
         
+        textoFuncion = new JLabel();
+        textoFuncion.setFont(letraTexto);
+        textoFuncion.setForeground(colorInfo);
+
+        panelInformacion = new JPanel();
+        panelInformacion.setOpaque(false);
+        panelInformacion.setBounds(0,15,800,100);
+        var estilo = new FlowLayout(FlowLayout.CENTER);
+        estilo.setHgap(20);
+        panelInformacion.setLayout(estilo);
+
+        panelInformacion.add(valorA);
+        panelInformacion.add(valorB);
+        panelInformacion.add(valorError);
+        panelInformacion.add(textoFuncion);
+
+        panelEtiquetas.add(panelInformacion);
+
         panelTabla.add(panelScroll, BorderLayout.CENTER);
         panelTabla.add(panelEtiquetas, BorderLayout.NORTH);
     }

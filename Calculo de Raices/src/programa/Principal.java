@@ -8,7 +8,8 @@ public class Principal
 	public static void main(String[] args) 
 	{
 		Funcion funcion = (x) -> -0.5*Math.pow(x,2) + 2.5*x + 4; 
-		new Ventana(funcion);
+		String textoFuncion = "-0.5x^2 + 2.5x + 4";
+		new Ventana(funcion, textoFuncion);
 
 		
 		// CalculoRaices metodoUsado = new Biseccion(funcion, 5, 9);
