@@ -119,7 +119,8 @@ public class Ventana extends JFrame{
                 celdas.addRow(fila);
             }
 
-            
+            JOptionPane.showMessageDialog(this, "Hemos Calculado las Raices\n\n".toUpperCase() +
+            "Puede Observar los Calculos en la \"Tabla\"", "CALCULOS REALIZADOS CON EXITO!!!", JOptionPane.INFORMATION_MESSAGE);
         });
     }
     private boolean estanEnElIntervalo(CalculoRaices[] metodos,double puntoA, double puntoB){
@@ -248,7 +249,7 @@ public class Ventana extends JFrame{
         campoB = new Campo(letraTexto);
         campoB.setText("8");
 
-        textoError = new JLabel("Ingrese el Margen de Error(%)");
+        textoError = new JLabel("Margen de Error(%)");
         textoError.setFont(letraTexto);
 
         campoError = new Campo(letraTexto);
