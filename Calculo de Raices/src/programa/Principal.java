@@ -1,14 +1,15 @@
 package programa;
 
+import datos.Funcion;
 import datos.Ventana;
 
 public class Principal 
 {
 	public static void main(String[] args) 
 	{
-		new Ventana();
+		Funcion funcion = (x) -> -0.5*Math.pow(x,2) + 2.5*x + 4; 
+		new Ventana(funcion);
 
-		// Funcion funcion = (x) -> -0.5*Math.pow(x,2) + 2.5*x + 4; 
 		
 		// CalculoRaices metodoUsado = new Biseccion(funcion, 5, 9);
 		// metodoUsado.setTolerancia(0.0001);

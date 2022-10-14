@@ -21,6 +21,10 @@ public abstract class CalculoRaices
     public double calcularErrorRelativo(){
         return Math.abs((ultima - anterior) / ultima * 100);
     }
+	
+	public boolean estaEnElIntervalo(double a, double b){
+        return getFuncion().evaluar(a)*getFuncion().evaluar(b) < 0;
+    }
     
     public double getTolerancia() {
 		return tolerancia;

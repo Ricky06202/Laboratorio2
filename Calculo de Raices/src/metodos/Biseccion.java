@@ -11,14 +11,7 @@ public class Biseccion extends CalculoRaices
         this.intervaloA = intervaloA;
         this.intervaloB = intervaloB;
             
-    }
-
-    private boolean estaEnElIntervalo(double intervaloA,double intervaloB)
-    {
-        return getFuncion().evaluar(intervaloA)*getFuncion().evaluar(intervaloB) < 0;
-    }
-
-   
+    }   
 
     @Override
     public Double calcularSiguiente() 

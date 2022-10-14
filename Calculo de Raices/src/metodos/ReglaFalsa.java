@@ -29,8 +29,4 @@ public class ReglaFalsa extends CalculoRaices {
         setUltima(respuesta);
 		return respuesta;
 	}
-
-    private boolean estaEnElIntervalo(double a, double b){
-        return getFuncion().evaluar(a)*getFuncion().evaluar(b) < 0;
-    }
 }

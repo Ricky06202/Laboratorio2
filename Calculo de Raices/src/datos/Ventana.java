@@ -7,17 +7,23 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
+import metodos.Biseccion;
+import metodos.CalculoRaices;
+import metodos.ReglaFalsa;
+import metodos.Secante;
 
 public class Ventana extends JFrame{
     private JPanel panelSuperior, panelIzquierdo, panelCentral;
@@ -37,21 +43,122 @@ public class Ventana extends JFrame{
     private JPanel panelEtiquetas;
     private JLabel biseccion, reglaFalsa, secante;
 
+    private double puntoA, puntoB, error;
+    private DecimalFormat formato = new DecimalFormat("#.############");
+    private boolean deseaContinuar;
+
+
     private Font letraMenu = new Font("Forte", Font.PLAIN, 40),
     letraTitulo = new Font("Maiandra GD", Font.BOLD, 60), 
     letraSubTitulo = new Font("Maiandra GD", Font.BOLD, 40), 
-    letraTexto = new Font("Maiandra GD", Font.PLAIN, 20), 
+    letraTexto = new Font("Maiandra GD", Font.PLAIN, 30), 
     letraBoton = new Font("Matura MT Script Capitals", Font.PLAIN, 40),
     letraBotonAccionVentana = new Font("Bauhaus 93", Font.PLAIN, 20);
 
-    public Ventana(){
+    public Ventana(Funcion funcion){
         inicializarVentana();
         inicializarPanelIzquierdo();
         inicializarPanelSuperior();
         inicializarPanelCentral();
+        panelCentral.add(panelPrincipal); // para que sea el primero en aparecer
+        establecerFuncionBotonesMenu();
+        establecerFuncionBotonAceptar(funcion);
+        setVisible(true);
 
-        panelCentral.add(panelPrincipal);
+    }
+    private boolean opcionSiNo(String mensaje, String titulo){
+        while (true) {
+            int valor = JOptionPane.showOptionDialog(null, mensaje, titulo, 0, 1, null, "Si, No".split(", "), null);
+            if(valor != -1)
+                return valor == 0; // 0 = Si, 1 = No, -1 = Cerrar la ventana
+            JOptionPane.showMessageDialog(this, "ERROR, DEBE ELEGIR UNA DE LAS OPCIONES", "ERROR OPCION INVALIDA", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void establecerFuncionBotonAceptar(Funcion funcion) {
+        botonAceptar.addActionListener((e) -> {
+            try {
+                puntoA = Double.parseDouble(campoA.getText());
+                puntoB = Double.parseDouble(campoB.getText());
+                error = Double.parseDouble(campoError.getText());
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "ERROR, EL NUMERO INGRESADO ES INVALIDO", 
+                "ERROR NUMERO INVALIDO", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
+            CalculoRaices[] metodos = {
+                new Biseccion(funcion, puntoA, puntoB),
+                new ReglaFalsa(funcion, puntoA, puntoB),
+                new Secante(funcion, puntoA, puntoB)
+            };
+            deseaContinuar = false;
+            if(!estanEnElIntervalo(metodos, puntoA, puntoB)){
+                deseaContinuar = opcionSiNo("ERROR, LOS PUNTOS A Y B SE ENCUENTRAN FUERA DE RANGO\n\n" + "Si Desea Podemos Calcular Unicamente Usando el Metodo de Secante", 
+                "ERROR PUNTOS FUERA DE RANGO");
+                if(!deseaContinuar)
+                    return;
+            }
+
+            for (CalculoRaices metodo : metodos) {
+                metodo.setTolerancia(error);
+            }
+            DefaultTableModel celdas = (DefaultTableModel)tabla.getModel();
+            limpiarTabla(celdas);
+            Object[] fila = new Object[7];
+            fila[0] = -1;
+            fila[5] = formato.format(puntoB);
+            celdas.addRow(fila);
+            fila[0] = 0;
+            fila[5] = formato.format(puntoA);
+            fila[6] = formato.format(metodos[2].calcularErrorRelativo());
+            celdas.addRow(fila);
+            int conteo = 1;
+
+            while(!hemosLlegadoAlObjetivo(metodos) || conteo == 1){
+                fila = obtenerFilaTabla(metodos, conteo++);
+                celdas.addRow(fila);
+            }
+
+            
+        });
+    }
+    private boolean estanEnElIntervalo(CalculoRaices[] metodos,double puntoA, double puntoB){
+        for (CalculoRaices metodo : metodos) {
+            if(!metodo.estaEnElIntervalo(puntoA, puntoB))
+                return false;
+        }
+        return true;
+    }
+    private void limpiarTabla(DefaultTableModel celdas){
+        for (int i = 0; i < celdas.getRowCount(); i++) {
+            celdas.removeRow(i);
+            i--;
+        }
+        panelCentral.updateUI();
+    }
+    private boolean hemosLlegadoAlObjetivo(CalculoRaices[] metodos){
+        for (CalculoRaices metodo : metodos) {
+            if(metodo.calcularErrorRelativo() > metodo.getTolerancia())
+                return false;
+        }
+        return true;
+    }
+    private Object[] obtenerFilaTabla(CalculoRaices[] metodos, int conteo){
+        ArrayList<Object> fila = new ArrayList<>();
+        fila.add(conteo);
+        for (CalculoRaices metodo : metodos) {
+            if(metodo.calcularErrorRelativo() < metodo.getTolerancia() || deseaContinuar && !(metodo instanceof Secante)){
+                fila.add("");
+                fila.add("");
+            }
+            else{
+                fila.add(formato.format(metodo.calcularSiguiente()));
+                fila.add(formato.format(metodo.calcularErrorRelativo()));
+            }
+        }
+        return fila.toArray();
+    }
+    private void establecerFuncionBotonesMenu() {
         botonPrincipal.addActionListener((e) -> {
             panelCentral.removeAll();
             panelCentral.add(panelPrincipal);
@@ -69,9 +176,6 @@ public class Ventana extends JFrame{
             panelCentral.add(panelTabla);
             panelCentral.updateUI();
         });
-
-        setVisible(true);
-
     }
     private void inicializarPanelCentral() {
         panelCentral = new JPanel();
@@ -80,6 +184,10 @@ public class Ventana extends JFrame{
         add(panelCentral, BorderLayout.CENTER);
         inicializarPanelPrincipal();//! Principal
         inicializarPanelDatos();//! Datos
+        inicializarPanelTabla();//! Tabla
+
+    }
+    private void inicializarPanelTabla() {
         panelTabla = new JPanel();
         panelTabla.setOpaque(false);
         panelTabla.setLayout(new BorderLayout());
@@ -97,11 +205,26 @@ public class Ventana extends JFrame{
         panelEtiquetas = new JPanel();
         panelEtiquetas.setOpaque(false);
         panelEtiquetas.setLayout(null);
-        panelEtiquetas.setPreferredSize(new Dimension(0,100));
+        panelEtiquetas.setPreferredSize(new Dimension(0,50));
+
+        biseccion = new JLabel("Bisección");
+        biseccion.setFont(letraTexto);
+        biseccion.setBounds(165,3,200,50);
+        
+        reglaFalsa = new JLabel("Regla Falsa");
+        reglaFalsa.setFont(letraTexto);
+        reglaFalsa.setBounds(165*2+50,3,200,50);
+        
+        secante = new JLabel("Secante");
+        secante.setFont(letraTexto);
+        secante.setBounds(165*4-30,3,200,50);
+        
+        panelEtiquetas.add(biseccion);
+        panelEtiquetas.add(reglaFalsa);
+        panelEtiquetas.add(secante);
         
         panelTabla.add(panelScroll, BorderLayout.CENTER);
         panelTabla.add(panelEtiquetas, BorderLayout.NORTH);
-
     }
     private void inicializarPanelDatos() {
         panelDatos = new JPanel();
@@ -117,13 +240,13 @@ public class Ventana extends JFrame{
         textoA.setFont(letraTexto);
 
         campoA = new Campo(letraTexto);
-        campoA.setText("3");
+        campoA.setText("5");
 
         textoB = new JLabel("Ingrese el Punto B");
         textoB.setFont(letraTexto);
 
         campoB = new Campo(letraTexto);
-        campoB.setText("7");
+        campoB.setText("8");
 
         textoError = new JLabel("Ingrese el Margen de Error(%)");
         textoError.setFont(letraTexto);
