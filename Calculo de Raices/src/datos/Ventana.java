@@ -7,34 +7,41 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.MouseListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 public class Ventana extends JFrame{
     private JPanel panelSuperior, panelIzquierdo, panelCentral;
     private JButton botonPrincipal, botonDatos, botonTabla;
     private JLabel textoTitulo;
-    private JButton botonCerrar, botonMinimizar, botonMaximizar;
+    private JButton botonCerrar, botonMinimizar;
     private JPanel panelAccionesVentana;
-    private boolean estaMaximizado = false;
     private Dimension tamanoVentana;
     private JPanel panelPrincipal, panelDatos, panelTabla;
     private JLabel textoMetodos, textoMetodos2, textoCreadoPor, textoIntegrantes, textoIntegrantes2;
     private JLabel textoA, textoB, textoError;
     private JTextField campoA, campoB, campoError;
-    private JPanel panelCampos;
+    private JPanel panelCampos, panelBienvenida;
+    private JButton botonAceptar;
+    private JTable tabla;
+    private JScrollPane panelScroll;
+    private JPanel panelEtiquetas;
+    private JLabel biseccion, reglaFalsa, secante;
 
     private Font letraMenu = new Font("Forte", Font.PLAIN, 40),
-    letraTitulo = new Font("Cooper", Font.BOLD, 60), 
-    letraSubTitulo = new Font("Cooper", Font.BOLD, 40), 
+    letraTitulo = new Font("Maiandra GD", Font.BOLD, 60), 
+    letraSubTitulo = new Font("Maiandra GD", Font.BOLD, 40), 
     letraTexto = new Font("Maiandra GD", Font.PLAIN, 20), 
-    letraBoton = new Font("Matura MT Script Capitals", Font.PLAIN, 20),
+    letraBoton = new Font("Matura MT Script Capitals", Font.PLAIN, 40),
     letraBotonAccionVentana = new Font("Bauhaus 93", Font.PLAIN, 20);
 
     public Ventana(){
@@ -43,41 +50,114 @@ public class Ventana extends JFrame{
         inicializarPanelSuperior();
         inicializarPanelCentral();
 
+        panelCentral.add(panelPrincipal);
+
+        botonPrincipal.addActionListener((e) -> {
+            panelCentral.removeAll();
+            panelCentral.add(panelPrincipal);
+            panelCentral.updateUI();
+        });
+
+        botonDatos.addActionListener((e) -> {
+            panelCentral.removeAll();
+            panelCentral.add(panelDatos);
+            panelCentral.updateUI();
+        });
+
+        botonTabla.addActionListener((e) -> {
+            panelCentral.removeAll();
+            panelCentral.add(panelTabla);
+            panelCentral.updateUI();
+        });
+
         setVisible(true);
 
     }
     private void inicializarPanelCentral() {
         panelCentral = new JPanel();
         panelCentral.setOpaque(false);
+        panelCentral.setLayout(new GridLayout(1,1));
         add(panelCentral, BorderLayout.CENTER);
-        inicializarPanelPrincipal();
-        panelDatos = new JPanel();
-        panelDatos.setAlignmentY(JPanel.CENTER_ALIGNMENT);
-        panelDatos.setAlignmentX(JPanel.CENTER_ALIGNMENT);
-        panelDatos.setOpaque(false);
+        inicializarPanelPrincipal();//! Principal
+        inicializarPanelDatos();//! Datos
+        panelTabla = new JPanel();
+        panelTabla.setOpaque(false);
+        panelTabla.setLayout(new BorderLayout());
 
+        DefaultTableModel modeloTabla = new DefaultTableModel(){
+            public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+        };
+        modeloTabla.setColumnIdentifiers("Iteracion, Xr, er%, Xr, er%, Xr, er%".split(", "));
+        tabla = new JTable(modeloTabla);
+        tabla.getTableHeader().setReorderingAllowed(false); 
+        
+        panelScroll = new JScrollPane(tabla);
+        panelScroll.setBounds(0,100,800,600);
+
+        panelEtiquetas = new JPanel();
+        panelEtiquetas.setOpaque(false);
+        panelEtiquetas.setLayout(null);
+        panelEtiquetas.setPreferredSize(new Dimension(0,100));
+        
+        panelTabla.add(panelScroll, BorderLayout.CENTER);
+        panelTabla.add(panelEtiquetas, BorderLayout.NORTH);
+
+    }
+    private void inicializarPanelDatos() {
+        panelDatos = new JPanel();
+        panelDatos.setOpaque(false);
+        panelDatos.setLayout(null);
+        
         panelCampos = new JPanel();
-        panelCampos.setLayout(new GridLayout(3, 2, 20, 20));
+        panelCampos.setLayout(new GridLayout(3, 2, 50, 20));
         panelCampos.setOpaque(false);
+        panelCampos.setBounds(80,160,600,150);
 
         textoA = new JLabel("Ingrese el Punto A");
         textoA.setFont(letraTexto);
 
+        campoA = new Campo(letraTexto);
+        campoA.setText("3");
+
         textoB = new JLabel("Ingrese el Punto B");
         textoB.setFont(letraTexto);
+
+        campoB = new Campo(letraTexto);
+        campoB.setText("7");
 
         textoError = new JLabel("Ingrese el Margen de Error(%)");
         textoError.setFont(letraTexto);
 
+        campoError = new Campo(letraTexto);
+        campoError.setText("0.0001");
+
+        panelCampos.add(textoA);
+        panelCampos.add(campoA);
+        panelCampos.add(textoB);
+        panelCampos.add(campoB);
+        panelCampos.add(textoError);
+        panelCampos.add(campoError);
+
+        botonAceptar = new Boton(letraBoton);
+        botonAceptar.setText("Aceptar");
+        botonAceptar.setVerticalAlignment(JButton.CENTER);
+        botonAceptar.setBounds(280,400,200,50);
+
+        panelDatos.add(panelCampos);
+        panelDatos.add(botonAceptar);
     }
     private void inicializarPanelPrincipal() {
         panelPrincipal = new JPanel();
         panelPrincipal.setOpaque(false);
-        var centrado = new GridLayout(8,1);
+        panelPrincipal.setLayout(null);
 
-        panelPrincipal.setLayout(centrado);
+        panelBienvenida = new JPanel();
+        panelBienvenida.setOpaque(false);
+        panelBienvenida.setLayout(new GridLayout(10,1));
+        panelBienvenida.setBounds(50, 150, 
+        700, 500);
 
-        textoMetodos = new JLabel("Usando los metodos de Bisección,");
+        textoMetodos = new JLabel("Usando los Métodos de Bisección,");
         textoMetodos.setFont(letraSubTitulo);
         textoMetodos.setHorizontalAlignment(JLabel.CENTER);
 
@@ -97,23 +177,23 @@ public class Ventana extends JFrame{
         textoIntegrantes2.setFont(letraTexto);
         textoIntegrantes2.setHorizontalAlignment(JLabel.CENTER);
 
-        panelPrincipal.add(new JLabel());
-        panelPrincipal.add(new JLabel());
-        panelPrincipal.add(new JLabel());
-        panelPrincipal.add(textoMetodos);
-        panelPrincipal.add(textoMetodos2);
-        panelPrincipal.add(textoCreadoPor);
-        panelPrincipal.add(textoIntegrantes);
-        panelPrincipal.add(textoIntegrantes2);
+        panelBienvenida.add(textoMetodos);
+        panelBienvenida.add(textoMetodos2);
+        panelBienvenida.add(new JLabel());
+        panelBienvenida.add(textoCreadoPor);
+        panelBienvenida.add(textoIntegrantes);
+        panelBienvenida.add(textoIntegrantes2);
+
+        panelPrincipal.add(panelBienvenida);
+
+        
     }
-    /**
-     * 
-     */
+
     private void inicializarPanelSuperior() {
         textoTitulo = new JLabel("Cálculo de Raíces");
         textoTitulo.setFont(letraTitulo);
         textoTitulo.setHorizontalAlignment(JLabel.CENTER);
-        textoTitulo.setForeground(new Color(73,105,255));
+        textoTitulo.setForeground(new Color(0,69,126));
 
         panelAccionesVentana = new JPanel();
         panelAccionesVentana.setBackground(new Color(63,150,221));
@@ -124,24 +204,12 @@ public class Ventana extends JFrame{
         botonCerrar.setText("X");
         botonCerrar.addActionListener((e) -> dispose());
 
-        botonMaximizar = new BotonChico(letraBotonAccionVentana);
-        botonMaximizar.setText("O");
-        botonMaximizar.addActionListener((e) -> {
-            if(estaMaximizado){
-                setSize(tamanoVentana);
-                setLocationRelativeTo(null);
-            }
-            else    
-                setExtendedState(MAXIMIZED_BOTH);
-            estaMaximizado = !estaMaximizado;
-        });
 
         botonMinimizar = new BotonChico(letraBotonAccionVentana);
         botonMinimizar.setText("—");
         botonMinimizar.addActionListener((e) -> setState(ICONIFIED));
 
         panelAccionesVentana.add(botonCerrar);
-        panelAccionesVentana.add(botonMaximizar);
         panelAccionesVentana.add(botonMinimizar);
 
         panelSuperior.add(textoTitulo, BorderLayout.CENTER);
@@ -176,14 +244,14 @@ public class Ventana extends JFrame{
         getContentPane().setBackground(Color.white);
 
         panelSuperior = new JPanel();
-        panelSuperior.setBackground(new Color(84,231,224));
+        panelSuperior.setBackground(new Color(98,184,255));
         panelSuperior.setPreferredSize(new Dimension(getWidth(), 100));
         panelSuperior.setLayout(new BorderLayout());
         panelSuperior.setMinimumSize(panelSuperior.getSize());
         add(panelSuperior, BorderLayout.NORTH);
 
         panelIzquierdo = new JPanel();
-        panelIzquierdo.setBackground(new Color(160,246,224));
+        panelIzquierdo.setBackground(new Color(143,204,254));
         panelIzquierdo.setPreferredSize(new Dimension(200, getHeight()));
         panelIzquierdo.setLayout(new GridLayout(7,1,0,20));
         panelIzquierdo.setMinimumSize(panelIzquierdo.getSize());

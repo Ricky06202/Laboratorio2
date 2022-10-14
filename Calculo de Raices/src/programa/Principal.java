@@ -1,7 +1,6 @@
 package programa;
 
-import datos.*;
-import metodos.*;
+import datos.Ventana;
 
 public class Principal 
 {

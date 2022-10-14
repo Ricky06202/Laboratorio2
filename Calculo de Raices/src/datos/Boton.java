@@ -7,19 +7,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 
 public class Boton extends JButton{
+    private Color colorEntered = new Color(20,164,255), colorExited = new Color(31,105,165);
     public Boton(Font letra){
-        setBackground(new Color(0,162,155));
+        setBackground(colorExited);
         setForeground(Color.white);
         setPreferredSize(new Dimension(200, 70));
         setFocusPainted(false);
         setBorderPainted(false);
         setFont(letra);
         setVerticalAlignment(JButton.TOP);
-        addMouseListener(new AccionesMouse(this, new Color(20,164,255), 
-        new Color(0,162,155)));
+        addMouseListener(new AccionesMouse(this, colorEntered, 
+        colorExited));
     }
 
     class AccionesMouse implements MouseListener{
@@ -35,7 +35,6 @@ public class Boton extends JButton{
     
         @Override
         public void mouseClicked(MouseEvent arg0) {
-            // TODO Auto-generated method stub
             
         }
     
@@ -53,13 +52,11 @@ public class Boton extends JButton{
     
         @Override
         public void mousePressed(MouseEvent arg0) {
-            // TODO Auto-generated method stub
             
         }
     
         @Override
         public void mouseReleased(MouseEvent arg0) {
-            // TODO Auto-generated method stub
             
         }
     
