@@ -112,6 +112,8 @@ public class Ventana extends JFrame{
             fila[5] = formato.format(puntoB);
             celdas.addRow(fila);
             fila[0] = 0;
+            fila[1] = 0;
+            fila[3] = 0;
             fila[5] = formato.format(puntoA);
             fila[6] = formato.format(metodos[2].calcularErrorRelativo());
             celdas.addRow(fila);
