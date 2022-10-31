@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -18,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.MouseInputListener;
 import javax.swing.table.DefaultTableModel;
 
 import metodos.Biseccion;
@@ -49,6 +51,8 @@ public class Ventana extends JFrame{
     private DecimalFormat formato = new DecimalFormat("#.############");
     private boolean deseaContinuar;
 
+    private int xMouse, yMouse;
+
 
     private Font letraMenu = new Font("Forte", Font.PLAIN, 40),
     letraTitulo = new Font("Maiandra GD", Font.BOLD, 60), 
@@ -66,6 +70,8 @@ public class Ventana extends JFrame{
         this.textoFuncion.setText("f(x) = " + textoFuncion);
         establecerFuncionBotonesMenu();
         establecerFuncionBotonAceptar(funcion);
+        panelAccionesVentana.addMouseListener(new Movilidad());
+        panelAccionesVentana.addMouseMotionListener(new Movilidad());
         setVisible(true);
 
     }
@@ -432,5 +438,47 @@ public class Ventana extends JFrame{
         panelIzquierdo.setLayout(new GridLayout(7,1,0,20));
         panelIzquierdo.setMinimumSize(panelIzquierdo.getSize());
         add(panelIzquierdo, BorderLayout.WEST);
+    }
+
+    class Movilidad implements MouseInputListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            xMouse = e.getX();
+            yMouse = e.getY();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            int x = e.getXOnScreen();
+            int y = e.getYOnScreen();
+            setLocation(x - xMouse, y - yMouse);        
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            
+        }
+
     }
 }
